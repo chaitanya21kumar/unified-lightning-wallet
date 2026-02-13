@@ -1,0 +1,25 @@
+[package]
+name = "ulw-bdk"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+ulw-core.workspace = true
+bdk_wallet.workspace = true
+bdk_chain.workspace = true
+bdk_electrum.workspace = true
+bdk_esplora.workspace = true
+bitcoin.workspace = true
+tokio.workspace = true
+async-trait.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }
+tempfile.workspace = true
