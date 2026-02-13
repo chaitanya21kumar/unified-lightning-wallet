@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  ulw:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: unified-lightning-wallet:latest
+    container_name: ulw
+    volumes:
+      - ulw-data:/home/ulw/.ulw
+    ports:
+      - "9735:9735"  # Lightning Network port
+    environment:
+      - RUST_LOG=info
+      - ULW_NETWORK=regtest
+    networks:
+      - ulw-network
+    restart: unless-stopped
+
+  # Optional: Electrum server for regtest
+  electrum:
+    image: lukechilds/electrumx:latest
+    container_name: ulw-electrum
+    ports:
+      - "50001:50001"
+      - "50002:50002"
+    environment:
+      - DAEMON_URL=http://user:pass@bitcoind:8332
+      - COIN=Bitcoin
+      - NET=regtest
+    networks:
+      - ulw-network
+    depends_on:
+      - bitcoind
+    restart: unless-stopped
+
+  # Optional: Bitcoin Core for regtest
+  bitcoind:
+    image: ruimarinho/bitcoin-core:latest
+    container_name: ulw-bitcoind
+    ports:
+      - "18443:18443"
+      - "18444:18444"
+    volumes:
+      - bitcoin-data:/home/bitcoin/.bitcoin
+    command:
+      -printtoconsole
+      -regtest=1
+      -rpcallowip=0.0.0.0/0
+      -rpcbind=0.0.0.0
+      -rpcuser=user
+      -rpcpassword=pass
+      -fallbackfee=0.00001
+    networks:
+      - ulw-network
+    restart: unless-stopped
+
+volumes:
+  ulw-data:
+    driver: local
+  bitcoin-data:
+    driver: local
+
+networks:
+  ulw-network:
+    driver: bridge
