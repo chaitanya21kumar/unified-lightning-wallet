@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/* Custom variables */
+:root {
+  --primary: #f7931a;
+  --secondary: #4a5568;
+  --background: #1a202c;
+  --surface: #2d3748;
+  --text: #e2e8f0;
+  --accent: #fbbf24;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--background);
+  color: var(--text);
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
