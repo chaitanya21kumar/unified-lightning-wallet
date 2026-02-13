@@ -6,7 +6,19 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-1.75%2B-blue.svg)](https://www.rust-lang.org)
 
-A self-custodial Bitcoin wallet combining on-chain (BDK) and Lightning Network (LDK) functionality into a single, easy-to-use CLI application.
+## 🌐 Live Web Demo
+
+**Try it now:** [https://unified-lightning-wallet.vercel.app](https://unified-lightning-wallet.vercel.app)
+
+Experience the wallet interface in your browser! The web demo showcases the UI and provides download links to the full desktop and CLI versions.
+
+---
+
+A self-custodial Bitcoin wallet combining on-chain (BDK) and Lightning Network (LDK) functionality into a single, easy-to-use application available in three formats:
+- 🖥️ **Desktop GUI** (Tauri + React)
+- 💻 **Command Line** (CLI)
+- 🌐 **Web Demo** (Live preview)
+
 
 ## 🚀 Features
 
