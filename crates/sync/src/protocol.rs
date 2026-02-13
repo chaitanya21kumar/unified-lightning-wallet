@@ -1,6 +1,6 @@
 //! Synchronization protocol
 
-use ulw_core::{Error, Result};
+use ulw_core::Result;
 
 pub struct SyncProtocol {
     // Placeholder

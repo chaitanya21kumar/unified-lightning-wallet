@@ -1,6 +1,6 @@
 //! LDK node implementation
 
-use ulw_core::{Error, Result};
+use ulw_core::Result;
 
 pub struct LdkNode {
     // Placeholder

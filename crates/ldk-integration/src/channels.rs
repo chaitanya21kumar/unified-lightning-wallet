@@ -1,6 +1,6 @@
 //! Lightning channel management
 
-use ulw_core::{Error, Result};
+use ulw_core::Result;
 
 pub struct ChannelManager {
     // Placeholder

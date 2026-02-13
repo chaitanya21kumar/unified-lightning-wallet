@@ -1,6 +1,6 @@
 //! Lightning event handling
 
-use ulw_core::{Error, Result};
+use ulw_core::Result;
 
 pub struct EventHandler {
     // Placeholder

@@ -1,6 +1,6 @@
 //! Lightning payment handling
 
-use ulw_core::{Error, Result};
+use ulw_core::Result;
 
 pub struct PaymentHandler {
     // Placeholder
@@ -11,11 +11,11 @@ impl PaymentHandler {
         Ok(Self {})
     }
 
-    pub async fn create_invoice(&self, amount_msat: u64, description: String) -> Result<String> {
+    pub async fn create_invoice(&self, amount_msat: u64, _description: String) -> Result<String> {
         Ok(format!("lnbc{}...", amount_msat))
     }
 
-    pub async fn pay_invoice(&self, invoice: String) -> Result<()> {
+    pub async fn pay_invoice(&self, _invoice: String) -> Result<()> {
         Ok(())
     }
 }
