@@ -12,6 +12,7 @@ pub struct WalletConfig {
 }
 
 impl WalletConfig {
+    #[allow(dead_code)]
     pub fn new(data_dir: PathBuf, network: NetworkConfig) -> Self {
         Self {
             data_dir,
@@ -33,6 +34,7 @@ impl WalletConfig {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub fn database_path(&self) -> PathBuf {
         self.data_dir.join(format!("{}.db", self.wallet_name))
     }

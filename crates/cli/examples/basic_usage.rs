@@ -18,9 +18,7 @@ use ulw_core::Result;
 #[tokio::main]
 async fn main() -> Result<()> {
     // Initialize logging
-    tracing_subscriber::fmt()
-        .with_env_filter("info")
-        .init();
+    tracing_subscriber::fmt().with_env_filter("info").init();
 
     println!("🌩️  Unified Lightning Wallet - Basic Usage Example\n");
 
@@ -34,12 +32,7 @@ async fn main() -> Result<()> {
     let change_descriptor = "wpkh(tprv8ZgxMBicQKsPeZRHk4rTG6orPS2CRNFX3njhUXx5vj9qGog5ZMH4uGReDWN5kCkY3jmWEtWause41CDvBRXD1shKknAMKxT99o9qUTRVC6m/84'/1'/0'/1/*)".to_string();
 
     println!("📝 Creating wallet...");
-    let wallet = BdkWallet::new(
-        network,
-        descriptor,
-        change_descriptor,
-        electrum_url,
-    )?;
+    let wallet = BdkWallet::new(network, descriptor, change_descriptor, electrum_url)?;
     println!("✅ Wallet created successfully!\n");
 
     // Generate a receiving address

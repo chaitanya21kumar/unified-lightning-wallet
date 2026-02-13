@@ -45,7 +45,11 @@ async fn main() -> Result<()> {
     db.save_payment(&payment).await?;
     println!("✅ Payment saved!");
     println!("   Hash: {}", payment.payment_hash);
-    println!("   Amount: {} msat ({} sats)", payment.amount_msat, payment.amount_msat / 1000);
+    println!(
+        "   Amount: {} msat ({} sats)",
+        payment.amount_msat,
+        payment.amount_msat / 1000
+    );
     println!("   Direction: {:?}", payment.direction);
     println!("   Status: {:?}\n", payment.status);
 
@@ -83,7 +87,10 @@ async fn main() -> Result<()> {
     println!("✅ Channel saved!");
     println!("   Channel ID: {}", channel.channel_id);
     println!("   Capacity: {} sats", channel.capacity_sats);
-    println!("   Local Balance: {} sats", channel.local_balance_msat / 1000);
+    println!(
+        "   Local Balance: {} sats",
+        channel.local_balance_msat / 1000
+    );
     println!("   State: {:?}\n", channel.state);
 
     // List all channels

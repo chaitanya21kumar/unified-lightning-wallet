@@ -46,11 +46,13 @@ pub async fn init_wallet() -> Result<()> {
         .map_err(|e| ulw_core::Error::Internal(e.to_string()))?;
 
     // Create config
-    let mut config = WalletConfig::default();
-    config.network = NetworkConfig {
-        network,
-        electrum_url,
-        lightning_port,
+    let config = WalletConfig {
+        network: NetworkConfig {
+            network,
+            electrum_url,
+            lightning_port,
+        },
+        ..Default::default()
     };
 
     // Ensure data directory exists
