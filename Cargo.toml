@@ -22,12 +22,12 @@ categories = ["cryptography::cryptocurrencies"]
 
 [workspace.dependencies]
 # Bitcoin & Lightning Core
-lightning = "0.0.124"
+lightning = "0.0.125"
 lightning-invoice = "0.32"
-lightning-net-tokio = "0.0.124"
-lightning-persister = "0.0.124"
-lightning-background-processor = "0.0.124"
-lightning-transaction-sync = "0.0.124"
+lightning-net-tokio = "0.0.125"
+lightning-persister = "0.0.125"
+lightning-background-processor = "0.0.125"
+lightning-transaction-sync = "0.0.125"
 bdk_wallet = { version = "1.0", features = ["keys-bip39"] }
 bdk_chain = "0.18"
 bdk_electrum = "0.18"
@@ -72,7 +72,7 @@ argon2 = "0.5"
 # Utils
 hex = "0.4"
 bs58 = "0.5"
-chrono = "0.4"
+chrono = { version = "0.4", features = ["serde"] }
 
 # Testing
 proptest = "1.5"
