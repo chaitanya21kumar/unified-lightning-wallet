@@ -1,8 +1,8 @@
 //! Wallet database implementation
 
-use ulw_core::{Error, Result};
 use rusqlite::Connection;
 use std::path::Path;
+use ulw_core::{Error, Result};
 
 pub struct WalletDatabase {
     conn: Connection,

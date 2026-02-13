@@ -1,6 +1,6 @@
 //! Core traits for wallet components
 
-use crate::{Result, types::*};
+use crate::{types::*, Result};
 use async_trait::async_trait;
 use bitcoin::{Address, Txid};
 
@@ -43,11 +43,7 @@ pub trait LightningNode: Send + Sync {
     async fn connect_peer(&self, node_id: String, addr: String) -> Result<()>;
 
     /// Open a new channel
-    async fn open_channel(
-        &self,
-        node_id: String,
-        amount_sats: u64,
-    ) -> Result<String>;
+    async fn open_channel(&self, node_id: String, amount_sats: u64) -> Result<String>;
 
     /// Close a channel
     async fn close_channel(&self, channel_id: String) -> Result<()>;

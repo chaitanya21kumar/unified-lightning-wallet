@@ -1,10 +1,10 @@
 //! BDK wallet implementation
 
-use ulw_core::{Error, Result};
-use bdk_wallet::{Wallet, KeychainKind};
-use bitcoin::{Network, Address, Amount, Txid};
+use bdk_wallet::{KeychainKind, Wallet};
+use bitcoin::{Address, Amount, Network, Txid};
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use ulw_core::{Error, Result};
 
 pub struct BdkWallet {
     wallet: Arc<Mutex<Wallet>>,

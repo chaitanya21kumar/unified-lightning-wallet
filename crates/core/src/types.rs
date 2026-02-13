@@ -1,7 +1,7 @@
 //! Core domain types
 
 use bitcoin::{Amount, Network};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// Wallet balance information
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
