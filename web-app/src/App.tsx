@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { Toaster, toast } from 'react-hot-toast'
+import { Analytics } from '@vercel/analytics/react'
 import './App.css'
 
 function App() {
@@ -40,10 +41,12 @@ function App() {
     })
   }
 
-  if (activeView === 'landing') {
-    return (
-      <div className="min-h-screen bg-dark-950 text-white overflow-hidden relative">
-        <Toaster position="top-right" />
+  return (
+    <>
+      <Analytics />
+      {activeView === 'landing' ? (
+        <div className="min-h-screen bg-dark-950 text-white overflow-hidden relative">
+          <Toaster position="top-right" />
 
         {/* Animated background particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -314,13 +317,9 @@ function App() {
           </footer>
         </div>
       </div>
-    )
-  }
-
-  // Wallet Demo View
-  return (
-    <div className="min-h-screen bg-dark-950 text-white">
-      <Toaster position="top-right" />
+      ) : (
+        <div className="min-h-screen bg-dark-950 text-white">
+          <Toaster position="top-right" />
 
       {/* Warning Banner */}
       <div className="bg-bitcoin-500/10 border-y border-bitcoin-500/30 py-3">
@@ -511,7 +510,9 @@ function App() {
           </div>
         </motion.div>
       </div>
-    </div>
+        </div>
+      )}
+    </>
   )
 }
 
