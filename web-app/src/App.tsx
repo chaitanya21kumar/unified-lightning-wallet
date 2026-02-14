@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { Toaster, toast } from 'react-hot-toast'
+import { Analytics } from '@vercel/analytics/react'
 import './App.css'
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
     return (
       <div className="min-h-screen bg-dark-950 text-white overflow-hidden relative">
         <Toaster position="top-right" />
+        <Analytics />
 
         {/* Animated background particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -321,6 +323,7 @@ function App() {
   return (
     <div className="min-h-screen bg-dark-950 text-white">
       <Toaster position="top-right" />
+      <Analytics />
 
       {/* Warning Banner */}
       <div className="bg-bitcoin-500/10 border-y border-bitcoin-500/30 py-3">
