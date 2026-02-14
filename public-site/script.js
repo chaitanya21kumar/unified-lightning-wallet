@@ -2,7 +2,15 @@
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        const href = this.getAttribute('href');
+
+        // Handle author link specially
+        if (href === '#author') {
+            openAuthorModal();
+            return;
+        }
+
+        const target = document.querySelector(href);
         if (target) {
             target.scrollIntoView({
                 behavior: 'smooth',
@@ -10,6 +18,38 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             });
         }
     });
+});
+
+// Author Modal functionality
+const authorModal = document.getElementById('author-modal');
+const authorLinks = document.querySelectorAll('.author-link, .author-nav-link');
+
+authorLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        openAuthorModal();
+    });
+});
+
+function openAuthorModal() {
+    if (authorModal) {
+        authorModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeAuthorModal() {
+    if (authorModal) {
+        authorModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+// Close modal on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && authorModal && authorModal.classList.contains('active')) {
+        closeAuthorModal();
+    }
 });
 
 // Add scroll animation class to elements

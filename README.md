@@ -12,6 +12,25 @@
 
 Experience the wallet interface in your browser! The web demo showcases the UI and provides download links to the full desktop and CLI versions.
 
+## ✨ Screenshots
+
+### Beautiful Modern UI
+<div align="center">
+
+| Landing Page | Wallet Interface |
+|:---:|:---:|
+| ![Landing Page](docs/images/hero.png) | ![Wallet Interface](docs/images/wallet.png) |
+
+| Features Showcase | Multi-Platform Downloads |
+|:---:|:---:|
+| ![Features](docs/images/features.png) | ![Downloads](docs/images/downloads.png) |
+
+| On-Chain Wallet | Transaction History |
+|:---:|:---:|
+| ![On-Chain](docs/images/onchain.png) | ![Transactions](docs/images/transactions.png) |
+
+</div>
+
 ---
 
 A self-custodial Bitcoin wallet combining on-chain (BDK) and Lightning Network (LDK) functionality into a single, easy-to-use application available in three formats:
@@ -314,7 +333,7 @@ Wallet configuration is stored in `~/.ulw/config.json`:
 
 ## 🤝 Contributing
 
-Contributions are welcome! This project is being developed for **Summer of Bitcoin 2026**.
+Contributions are welcome! Please feel free to submit pull requests or open issues.
 
 ### Development Process
 
@@ -378,14 +397,17 @@ Built with:
 - [LDK](https://lightningdevkit.org/) - Lightning Development Kit
 - [Rust](https://www.rust-lang.org/) - Systems programming language
 
-## 📞 Contact
+## 👨‍💻 Author
 
-- **Author**: Chaitanya Kumar
-- **GitHub**: [@chaitanya21kumar](https://github.com/chaitanya21kumar)
-- **Project**: [Unified Lightning Wallet](https://github.com/chaitanya21kumar/unified-lightning-wallet)
+**Chaitanya Kumar**
+
+Passionate Bitcoin enthusiast and developer building the future of self-custodial wallets.
+
+- GitHub: [@chaitanya21kumar](https://github.com/chaitanya21kumar)
+- Project: [Unified Lightning Wallet](https://github.com/chaitanya21kumar/unified-lightning-wallet)
 
 ---
 
-**⚡ Built for Summer of Bitcoin 2026**
+Built with ❤️ for the Bitcoin community
 
 **⚠️ Educational/Development Software - Not for production use with real funds**
