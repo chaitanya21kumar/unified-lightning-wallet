@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Demo - Unified Lightning Wallet</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .wallet-container {
+            min-height: 100vh;
+            padding: 6rem 0 4rem;
+        }
+        .demo-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 1rem;
+            text-align: center;
+            color: white;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            box-shadow: 0 4px 20px rgba(247, 147, 26, 0.3);
+        }
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 2rem;
+            padding: 3rem;
+            margin: 6rem 0 3rem;
+            color: white;
+            box-shadow: 0 20px 60px rgba(247, 147, 26, 0.3);
+        }
+        .balance-amount {
+            font-size: 4rem;
+            font-weight: 900;
+            margin: 1rem 0;
+        }
+        .wallet-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        .wallet-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .wallet-section-icon {
+            font-size: 2rem;
+        }
+        .qr-placeholder {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin: 1.5rem 0;
+            display: inline-block;
+        }
+        .address-box {
+            background: var(--surface);
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            word-break: break-all;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+        }
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .copy-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .disabled-input {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            color: var(--text-muted);
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        .disabled-btn {
+            background: var(--surface);
+            color: var(--text-muted);
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            font-weight: 600;
+            cursor: not-allowed;
+            opacity: 0.5;
+            width: 100%;
+        }
+        .transactions-empty {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+        .transactions-empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="logo-text">ULW</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">← Back to Home</a>
+                    <a href="https://github.com/chaitanya21kumar/unified-lightning-wallet/releases" target="_blank" class="btn-primary">Download Full App</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Demo Banner -->
+    <div class="demo-banner">
+        <strong>⚠️ Demo Mode:</strong> This is a UI demonstration. Download the desktop app for full wallet functionality.
+    </div>
+
+    <!-- Wallet Container -->
+    <div class="wallet-container">
+        <div class="container">
+            <!-- Balance Card -->
+            <div class="balance-card">
+                <p style="opacity: 0.9; font-size: 0.875rem;">Total Balance</p>
+                <div class="balance-amount">0.00150000 BTC</div>
+                <p style="opacity: 0.8;">≈ $67.50 USD (Testnet Demo)</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
+                <!-- Receive Section -->
+                <div class="wallet-section">
+                    <h3>
+                        <span class="wallet-section-icon">📥</span>
+                        Receive Bitcoin
+                    </h3>
+
+                    <div class="qr-placeholder">
+                        <svg width="200" height="200" viewBox="0 0 200 200">
+                            <rect width="200" height="200" fill="#000"/>
+                            <rect x="10" y="10" width="40" height="40" fill="#fff"/>
+                            <rect x="150" y="10" width="40" height="40" fill="#fff"/>
+                            <rect x="10" y="150" width="40" height="40" fill="#fff"/>
+                            <rect x="70" y="30" width="60" height="20" fill="#fff"/>
+                            <rect x="30" y="70" width="20" height="60" fill="#fff"/>
+                            <rect x="150" y="70" width="30" height="80" fill="#fff"/>
+                            <rect x="70" y="150" width="80" height="30" fill="#fff"/>
+                            <text x="100" y="105" text-anchor="middle" fill="#fff" font-size="12">QR Code</text>
+                        </svg>
+                    </div>
+
+                    <div class="address-box">
+                        tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx
+                    </div>
+
+                    <button class="copy-btn" onclick="copyAddress()">📋 Copy Address</button>
+                    <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 1rem;">
+                        Testnet address for demonstration only
+                    </p>
+                </div>
+
+                <!-- Send Section -->
+                <div class="wallet-section">
+                    <h3>
+                        <span class="wallet-section-icon">📤</span>
+                        Send Bitcoin
+                    </h3>
+
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.875rem;">
+                        Recipient Address
+                    </label>
+                    <input type="text" class="disabled-input" placeholder="Enter Bitcoin address..." disabled>
+
+                    <label style="display: block; margin-bottom: 0.5rem; margin-top: 1rem; color: var(--text-muted); font-size: 0.875rem;">
+                        Amount (BTC)
+                    </label>
+                    <input type="text" class="disabled-input" placeholder="0.00000000" disabled>
+
+                    <button class="disabled-btn" disabled>
+                        🚀 Download Full App to Send
+                    </button>
+
+                    <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 1rem;">
+                        Sending requires the full desktop or CLI application
+                    </p>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="wallet-section" style="margin-top: 2rem;">
+                <h3>
+                    <span class="wallet-section-icon">📜</span>
+                    Recent Transactions
+                </h3>
+
+                <div class="transactions-empty">
+                    <div class="transactions-empty-icon">💳</div>
+                    <p style="font-size: 1.125rem; margin-bottom: 0.5rem;">No transactions yet</p>
+                    <p>Download the full app to start using your wallet</p>
+                </div>
+            </div>
+
+            <!-- Download CTA -->
+            <div style="text-align: center; margin-top: 4rem;">
+                <h2 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem;">
+                    Ready for the <span class="gradient-text">Full Experience</span>?
+                </h2>
+                <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 1.125rem;">
+                    Download the complete wallet to send, receive, and manage your Bitcoin
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://github.com/chaitanya21kumar/unified-lightning-wallet/releases" target="_blank" class="btn-hero">
+                        📥 Download Desktop App
+                    </a>
+                    <a href="index.html" class="btn-secondary">
+                        ← Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="logo">
+                        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="logo-text">Unified Lightning Wallet</span>
+                    </div>
+                    <p class="footer-tagline">Built with ⚡ for Summer of Bitcoin 2026</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="https://github.com/chaitanya21kumar/unified-lightning-wallet" target="_blank">GitHub</a>
+                    <a href="https://github.com/chaitanya21kumar/unified-lightning-wallet/blob/main/docs/USER_GUIDE.md" target="_blank">User Guide</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Unified Lightning Wallet. Open Source under MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function copyAddress() {
+            navigator.clipboard.writeText('tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx');
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Copied!';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 2000);
+        }
+
+        // Animate sections on load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.wallet-section').forEach((section, index) => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    section.style.transition = 'all 0.6s ease';
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

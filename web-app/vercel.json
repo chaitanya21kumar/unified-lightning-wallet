@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "buildCommand": "echo 'No build needed - serving static files'",
+  "outputDirectory": "public",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": null
