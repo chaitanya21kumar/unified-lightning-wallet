@@ -6,8 +6,8 @@
 use bitcoin::secp256k1::{PublicKey, Secp256k1};
 use bitcoin::{hashes::Hash as BitcoinHash, Network, Transaction};
 use lightning::chain::chaininterface::{BroadcasterInterface, ConfirmationTarget, FeeEstimator};
-use lightning::sign::{EntropySource, KeysManager, NodeSigner};
 use lightning::ln::{PaymentHash, PaymentSecret};
+use lightning::sign::{EntropySource, KeysManager, NodeSigner};
 use lightning::util::logger::{Logger, Record};
 use lightning_invoice::{Bolt11Invoice, Currency};
 use std::collections::HashMap;
@@ -94,10 +94,10 @@ pub enum PaymentStatus {
 pub struct LdkNode {
     keys_manager: Arc<KeysManager>,
     network: Network,
-    storage_path: PathBuf,
-    logger: Arc<SimpleLogger>,
-    fee_estimator: Arc<SimpleFeeEstimator>,
-    broadcaster: Arc<SimpleBroadcaster>,
+    _storage_path: PathBuf,
+    _logger: Arc<SimpleLogger>,
+    _fee_estimator: Arc<SimpleFeeEstimator>,
+    _broadcaster: Arc<SimpleBroadcaster>,
     payments: Arc<RwLock<HashMap<PaymentHash, PaymentInfo>>>,
 }
 
@@ -108,7 +108,11 @@ impl LdkNode {
     /// * `network` - Bitcoin network (testnet/regtest/mainnet)
     /// * `storage_path` - Path to store channel and node data
     /// * `entropy_seed` - 32 bytes of entropy for key derivation
-    pub async fn new(network: Network, storage_path: PathBuf, entropy_seed: [u8; 32]) -> Result<Self> {
+    pub async fn new(
+        network: Network,
+        storage_path: PathBuf,
+        entropy_seed: [u8; 32],
+    ) -> Result<Self> {
         // Create storage directory
         fs::create_dir_all(&storage_path)
             .map_err(|e| Error::Internal(format!("Failed to create storage: {}", e)))?;
@@ -128,25 +132,24 @@ impl LdkNode {
         let fee_estimator = Arc::new(SimpleFeeEstimator);
         let broadcaster = Arc::new(SimpleBroadcaster);
 
-        tracing::info!(
-            "Initialized Lightning node on {:?} network",
-            network
-        );
+        tracing::info!("Initialized Lightning node on {:?} network", network);
 
         Ok(Self {
             keys_manager,
             network,
-            storage_path,
-            logger,
-            fee_estimator,
-            broadcaster,
+            _storage_path: storage_path,
+            _logger: logger,
+            _fee_estimator: fee_estimator,
+            _broadcaster: broadcaster,
             payments: Arc::new(RwLock::new(HashMap::new())),
         })
     }
 
     /// Get the node's public key
     pub fn get_node_id(&self) -> PublicKey {
-        self.keys_manager.get_node_id(lightning::sign::Recipient::Node).unwrap()
+        self.keys_manager
+            .get_node_id(lightning::sign::Recipient::Node)
+            .unwrap()
     }
 
     /// Create a BOLT11 Lightning invoice
@@ -187,7 +190,7 @@ impl LdkNode {
             .duration_since_epoch(
                 SystemTime::now()
                     .duration_since(UNIX_EPOCH)
-                    .map_err(|e| Error::Internal(e.to_string()))?
+                    .map_err(|e| Error::Internal(e.to_string()))?,
             )
             .min_final_cltv_expiry_delta(144)
             .expiry_time(duration);
@@ -198,9 +201,7 @@ impl LdkNode {
 
         let node_secret = self.keys_manager.get_node_secret_key();
         let invoice = invoice_builder
-            .build_signed(|hash| {
-                Secp256k1::new().sign_ecdsa_recoverable(hash, &node_secret)
-            })
+            .build_signed(|hash| Secp256k1::new().sign_ecdsa_recoverable(hash, &node_secret))
             .map_err(|e| Error::Internal(format!("Failed to build invoice: {:?}", e)))?;
 
         // Store payment info
@@ -240,10 +241,7 @@ impl LdkNode {
             .amount_milli_satoshis()
             .ok_or_else(|| Error::InvalidInvoice("Invoice has no amount".to_string()))?;
 
-        tracing::info!(
-            "Attempting to pay invoice for {} msats",
-            amount_msats
-        );
+        tracing::info!("Attempting to pay invoice for {} msats", amount_msats);
 
         // Store payment info
         let mut payments = self.payments.write().await;

@@ -1,7 +1,5 @@
 //! Lightning Network command implementations
 
-use bitcoin::Network;
-use std::path::PathBuf;
 use ulw_core::Result;
 use ulw_ldk::LdkNode;
 
@@ -16,11 +14,7 @@ async fn create_ldk_node(config: &WalletConfig) -> Result<LdkNode> {
     let entropy_seed = derive_entropy_from_name(&config.wallet_name);
 
     // Create node
-    LdkNode::new(
-        config.network.network,
-        ldk_storage,
-        entropy_seed,
-    ).await
+    LdkNode::new(config.network.network, ldk_storage, entropy_seed).await
 }
 
 /// Derive a deterministic 32-byte seed from wallet name
@@ -88,6 +82,7 @@ pub async fn pay_invoice(config: &WalletConfig, invoice_str: String) -> Result<(
 }
 
 /// List Lightning payment history
+#[allow(dead_code)]
 pub async fn list_payments(config: &WalletConfig) -> Result<()> {
     println!("⚡ Lightning Payment History");
 
@@ -102,7 +97,11 @@ pub async fn list_payments(config: &WalletConfig) -> Result<()> {
 
     println!("Found {} payment(s):\n", payments.len());
     for (i, payment) in payments.iter().enumerate() {
-        println!("{}. Payment Hash: {}", i + 1, hex::encode(payment.payment_hash));
+        println!(
+            "{}. Payment Hash: {}",
+            i + 1,
+            hex::encode(payment.payment_hash)
+        );
         if let Some(amt) = payment.amount_msat {
             println!("   Amount: {} msats ({} sats)", amt, amt / 1000);
         }
@@ -114,6 +113,7 @@ pub async fn list_payments(config: &WalletConfig) -> Result<()> {
 }
 
 /// Get Lightning node information
+#[allow(dead_code)]
 pub async fn get_node_info(config: &WalletConfig) -> Result<()> {
     println!("⚡ Lightning Node Information");
 
