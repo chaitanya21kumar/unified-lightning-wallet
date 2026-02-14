@@ -1,19 +1,28 @@
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::State;
 use tokio::sync::Mutex;
 
 use ulw_bdk::BdkWallet;
+use ulw_ldk::LdkNode;
 
 // Application state holding wallet instances
 pub struct AppState {
     pub bdk_wallet: Arc<Mutex<Option<BdkWallet>>>,
+    pub ldk_node: Arc<Mutex<Option<LdkNode>>>,
+    pub data_dir: PathBuf,
 }
 
 impl AppState {
     pub fn new() -> Self {
+        let home_dir = dirs::home_dir().unwrap_or_else(|| PathBuf::from("."));
+        let data_dir = home_dir.join(".ulw");
+
         Self {
             bdk_wallet: Arc::new(Mutex::new(None)),
+            ldk_node: Arc::new(Mutex::new(None)),
+            data_dir,
         }
     }
 }
@@ -138,20 +147,88 @@ pub async fn list_transactions(state: State<'_, AppState>) -> Result<Vec<String>
     }
 }
 
-// Lightning commands (placeholders for now)
+// Lightning commands
 #[tauri::command]
 pub async fn create_lightning_invoice(
     amount_msats: u64,
     description: String,
+    state: State<'_, AppState>,
 ) -> Result<String, String> {
     log::info!("Creating invoice for {} msats: {}", amount_msats, description);
-    // TODO: Implement with LDK
-    Ok("lnbc...placeholder_invoice".to_string())
+
+    // Initialize LDK node if not already initialized
+    let mut node_guard = state.ldk_node.lock().await;
+
+    if node_guard.is_none() {
+        // Create Lightning node with demo entropy
+        // In production, derive from BDK wallet mnemonic
+        let entropy = derive_demo_entropy();
+        let lightning_dir = state.data_dir.join("lightning");
+
+        let node = LdkNode::new(
+            bitcoin::Network::Regtest,  // TODO: Get from wallet config
+            lightning_dir,
+            entropy,
+        )
+        .await
+        .map_err(|e| format!("Failed to create LDK node: {}", e))?;
+
+        *node_guard = Some(node);
+    }
+
+    // Create invoice
+    if let Some(node) = node_guard.as_ref() {
+        let invoice = node
+            .create_invoice(Some(amount_msats), description, 3600)
+            .await
+            .map_err(|e| e.to_string())?;
+
+        Ok(invoice)
+    } else {
+        Err("Lightning node not initialized".to_string())
+    }
 }
 
 #[tauri::command]
-pub async fn pay_lightning_invoice(invoice: String) -> Result<String, String> {
+pub async fn pay_lightning_invoice(
+    invoice: String,
+    state: State<'_, AppState>,
+) -> Result<String, String> {
     log::info!("Paying invoice: {}", invoice);
-    // TODO: Implement with LDK
-    Ok("placeholder_payment_hash".to_string())
+
+    let node_guard = state.ldk_node.lock().await;
+
+    if let Some(node) = node_guard.as_ref() {
+        let payment_hash = node
+            .pay_invoice(invoice)
+            .await
+            .map_err(|e| e.to_string())?;
+
+        Ok(hex::encode(payment_hash.0))
+    } else {
+        Err("Lightning node not initialized. Create an invoice first.".to_string())
+    }
+}
+
+// Helper function to derive demo entropy
+// WARNING: This is for demo purposes only!
+// In production, derive from BDK wallet mnemonic
+fn derive_demo_entropy() -> [u8; 32] {
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+
+    let wallet_name = "tauri_wallet";
+    let mut hasher = DefaultHasher::new();
+    wallet_name.hash(&mut hasher);
+    let hash = hasher.finish();
+
+    let mut entropy = [0u8; 32];
+    entropy[0..8].copy_from_slice(&hash.to_le_bytes());
+    // Fill rest with derivation
+    for (i, byte) in wallet_name.bytes().enumerate() {
+        if i + 8 < 32 {
+            entropy[i + 8] = byte;
+        }
+    }
+    entropy
 }
