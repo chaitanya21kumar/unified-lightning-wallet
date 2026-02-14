@@ -1,332 +1,516 @@
-import { useState } from 'react'
-import { Wallet, Zap, Send, RefreshCw, Copy, Github, Download, Terminal, Monitor, AlertCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  Wallet, Zap, Send, Download, Terminal, Github,
+  ArrowRight, Sparkles, Shield, Cpu,
+  Globe, Eye, EyeOff, Copy, AlertCircle
+} from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
+import { Toaster, toast } from 'react-hot-toast'
 import './App.css'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'demo' | 'download'>('demo')
+  const [showBalance, setShowBalance] = useState(true)
+  const [activeView, setActiveView] = useState<'landing' | 'wallet'>('landing')
+  const [walletTab, setWalletTab] = useState<'onchain' | 'lightning'>('onchain')
+  const [sendAmount, setSendAmount] = useState('')
+  const [receiveAddress] = useState('tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx')
 
-  const demoAddress = 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx'
+  // Particle effect
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([])
 
-  const copyAddress = () => {
-    navigator.clipboard.writeText(demoAddress)
-    alert('Demo address copied to clipboard!')
+  useEffect(() => {
+    const newParticles = Array.from({ length: 20 }).map((_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+    }))
+    setParticles(newParticles)
+  }, [])
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text)
+    toast.success(`${label} copied!`, {
+      icon: '📋',
+      style: {
+        background: '#1e2440',
+        color: '#fff',
+        border: '1px solid #f7931a',
+      },
+    })
   }
 
-  return (
-    <div className="min-h-screen p-6 bg-[var(--background)] text-[var(--text)]">
-      {/* Alert Banner */}
-      <div className="alert-warning mb-6 flex items-start gap-3">
-        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-        <div className="text-sm">
-          <strong>Web Demo Version:</strong> This is a demonstration of the Unified Lightning Wallet UI.
-          For full functionality including wallet creation, transactions, and Lightning Network features,
-          please download the desktop application or use the CLI version.
+  if (activeView === 'landing') {
+    return (
+      <div className="min-h-screen bg-dark-950 text-white overflow-hidden relative">
+        <Toaster position="top-right" />
+
+        {/* Animated background particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {particles.map((particle) => (
+            <motion.div
+              key={particle.id}
+              className="absolute w-2 h-2 bg-bitcoin-500/20 rounded-full"
+              style={{
+                left: `${particle.x}%`,
+                top: `${particle.y}%`,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0.2, 0.5, 0.2],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
         </div>
-      </div>
 
-      {/* Header */}
-      <header className="mb-6 p-6 bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] rounded-xl">
-        <div className="flex justify-between items-center flex-wrap gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">⚡ Unified Lightning Wallet</h1>
-            <p className="text-white/80 text-sm">Self-custodial Bitcoin & Lightning Network Wallet</p>
-          </div>
-          <div className="flex items-center gap-3 bg-white/20 px-4 py-2 rounded-lg">
-            <Wallet className="w-5 h-5 text-white" />
-            <span className="text-white font-bold">Web Demo</span>
-          </div>
-        </div>
-      </header>
+        {/* Gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-dark-950 via-dark-900 to-dark-800 opacity-90" />
 
-      {/* Navigation */}
-      <div className="flex gap-3 mb-6">
-        <button
-          onClick={() => setActiveTab('demo')}
-          className={`flex-1 flex items-center justify-center gap-2 p-4 rounded-lg transition ${
-            activeTab === 'demo'
-              ? 'bg-[var(--primary)] text-white'
-              : 'bg-[var(--surface)] hover:bg-[var(--secondary)]'
-          }`}
-        >
-          <Monitor className="w-5 h-5" />
-          UI Demo
-        </button>
-        <button
-          onClick={() => setActiveTab('download')}
-          className={`flex-1 flex items-center justify-center gap-2 p-4 rounded-lg transition ${
-            activeTab === 'download'
-              ? 'bg-[var(--primary)] text-white'
-              : 'bg-[var(--surface)] hover:bg-[var(--secondary)]'
-          }`}
-        >
-          <Download className="w-5 h-5" />
-          Get Full Version
-        </button>
-      </div>
-
-      {activeTab === 'demo' ? (
-        /* Demo Tab */
-        <div className="space-y-4">
-          {/* Balance Display */}
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-6 rounded-lg text-white">
-            <div className="text-sm opacity-80 mb-2">Demo Balance</div>
-            <div className="text-4xl font-bold mb-2">0.00150000 BTC</div>
-            <div className="text-sm opacity-70">≈ $67.50 USD (Demo)</div>
-          </div>
-
-          {/* Tabs */}
-          <div className="bg-[var(--surface)] rounded-lg overflow-hidden">
-            <div className="flex border-b border-[var(--secondary)]">
-              <div className="flex-1 p-4 bg-[var(--primary)] text-white font-semibold text-center">
-                <Wallet className="w-5 h-5 inline mr-2" />
-                On-Chain
-              </div>
-              <div className="flex-1 p-4 text-center">
-                <Zap className="w-5 h-5 inline mr-2" />
-                Lightning
-              </div>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Receive Section */}
-              <div>
-                <h3 className="text-lg font-bold mb-3">Receive Bitcoin (Demo)</h3>
-                <div className="flex gap-2 items-center">
-                  <code className="flex-1 p-3 bg-[var(--background)] rounded text-sm overflow-x-auto">
-                    {demoAddress}
-                  </code>
-                  <button
-                    onClick={copyAddress}
-                    className="p-3 bg-[var(--primary)] rounded hover:bg-[var(--accent)] transition"
-                    title="Copy address"
-                  >
-                    <Copy className="w-5 h-5" />
-                  </button>
+        {/* Main content */}
+        <div className="relative z-10">
+          {/* Header */}
+          <motion.header
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="container mx-auto px-6 py-6"
+          >
+            <nav className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-bitcoin rounded-xl flex items-center justify-center shadow-bitcoin">
+                  <Zap className="w-7 h-7 text-white" />
                 </div>
-                <p className="text-xs text-gray-400 mt-2">
-                  This is a testnet address for demonstration purposes only
-                </p>
+                <span className="text-2xl font-bold bg-gradient-bitcoin bg-clip-text text-transparent">
+                  ULW
+                </span>
               </div>
-
-              {/* Send Section */}
-              <div>
-                <h3 className="text-lg font-bold mb-3">Send Bitcoin (Demo UI)</h3>
-                <input
-                  type="text"
-                  placeholder="Bitcoin Address"
-                  disabled
-                  className="w-full p-3 mb-3 bg-[var(--background)] border-2 border-[var(--secondary)] rounded text-white opacity-50"
-                />
-                <input
-                  type="number"
-                  placeholder="Amount (sats)"
-                  disabled
-                  className="w-full p-3 mb-3 bg-[var(--background)] border-2 border-[var(--secondary)] rounded text-white opacity-50"
-                />
-                <button
-                  disabled
-                  className="w-full flex items-center justify-center gap-2 p-3 bg-[var(--secondary)] rounded opacity-50 cursor-not-allowed"
+              <div className="flex items-center gap-4">
+                <motion.a
+                  href="https://github.com/chaitanya21kumar/unified-lightning-wallet"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-2 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 hover:border-bitcoin-500/50 transition-all"
                 >
-                  <Send className="w-5 h-5" />
-                  Download Full Version to Send
-                </button>
-              </div>
-
-              {/* Sync Section */}
-              <div>
-                <button
-                  disabled
-                  className="w-full flex items-center justify-center gap-2 p-3 bg-[var(--secondary)] rounded opacity-50 cursor-not-allowed"
+                  <Github className="w-5 h-5 inline mr-2" />
+                  GitHub
+                </motion.a>
+                <motion.button
+                  onClick={() => setActiveView('wallet')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-2 bg-gradient-bitcoin rounded-lg font-semibold shadow-bitcoin hover:shadow-bitcoin-lg transition-all"
                 >
-                  <RefreshCw className="w-5 h-5" />
-                  Sync Wallet (Full Version Only)
-                </button>
+                  Launch Demo
+                </motion.button>
               </div>
-            </div>
-          </div>
+            </nav>
+          </motion.header>
 
-          {/* Features */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg">
-            <h3 className="text-lg font-bold mb-4">✨ Features</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Wallet className="w-5 h-5 text-green-500" />
-                </div>
-                <div>
-                  <div className="font-semibold">On-Chain Wallet</div>
-                  <div className="text-sm text-gray-400">BDK-powered Bitcoin wallet with HD key derivation</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Zap className="w-5 h-5 text-yellow-500" />
-                </div>
-                <div>
-                  <div className="font-semibold">Lightning Network</div>
-                  <div className="text-sm text-gray-400">LDK integration for instant payments (Desktop/CLI)</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Terminal className="w-5 h-5 text-blue-500" />
-                </div>
-                <div>
-                  <div className="font-semibold">CLI & GUI</div>
-                  <div className="text-sm text-gray-400">Command-line and desktop app versions available</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Monitor className="w-5 h-5 text-purple-500" />
-                </div>
-                <div>
-                  <div className="font-semibold">Self-Custodial</div>
-                  <div className="text-sm text-gray-400">Your keys, your Bitcoin. Full custody and control</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* Download Tab */
-        <div className="space-y-6">
-          <div className="bg-[var(--surface)] p-6 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">Download Full Version</h2>
-            <p className="text-gray-400 mb-6">
-              Get the complete Unified Lightning Wallet with full functionality including
-              wallet creation, transaction signing, and Lightning Network support.
+          {/* Hero Section */}
+          <motion.section
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="container mx-auto px-6 py-20 text-center"
+          >
+            <motion.div
+              animate={{
+                scale: [1, 1.02, 1],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+              }}
+              className="inline-block mb-6"
+            >
+              <span className="px-4 py-2 bg-bitcoin-500/10 border border-bitcoin-500/30 rounded-full text-bitcoin-400 text-sm font-semibold">
+                ⚡ Self-Custodial Bitcoin & Lightning Wallet
+              </span>
+            </motion.div>
+
+            <h1 className="text-6xl md:text-8xl font-extrabold mb-8 leading-tight">
+              <span className="bg-gradient-to-r from-white via-bitcoin-400 to-lightning-300 bg-clip-text text-transparent">
+                Unified Lightning
+              </span>
+              <br />
+              <span className="text-white">Wallet</span>
+            </h1>
+
+            <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+              Experience the future of Bitcoin with our cutting-edge wallet combining
+              <span className="text-bitcoin-500 font-semibold"> on-chain security</span> and
+              <span className="text-lightning-400 font-semibold"> Lightning speed</span>.
             </p>
 
-            <div className="grid md:grid-cols-2 gap-4 mb-6">
-              {/* Desktop GUI */}
-              <div className="border-2 border-[var(--primary)] rounded-lg p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-[var(--primary)] rounded-lg flex items-center justify-center">
-                    <Monitor className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-lg">Desktop GUI</div>
-                    <div className="text-sm text-gray-400">Tauri + React</div>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-400 mb-4">
-                  Beautiful desktop application for Windows, macOS, and Linux
-                </p>
-                <a
-                  href="https://github.com/chaitanya21kumar/unified-lightning-wallet/releases"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full text-center p-3 bg-[var(--primary)] rounded hover:bg-[var(--accent)] transition"
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <motion.button
+                onClick={() => setActiveView('wallet')}
+                whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(247, 147, 26, 0.6)' }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-4 bg-gradient-bitcoin rounded-xl font-bold text-lg shadow-bitcoin flex items-center gap-3 group"
+              >
+                Try Demo Wallet
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+
+              <motion.a
+                href="#download"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-4 bg-white/5 backdrop-blur-sm rounded-xl font-bold text-lg border border-white/10 hover:border-bitcoin-500/50 transition-all flex items-center gap-3"
+              >
+                <Download className="w-5 h-5" />
+                Download App
+              </motion.a>
+            </div>
+          </motion.section>
+
+          {/* Features Section */}
+          <motion.section
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="container mx-auto px-6 py-20"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-center mb-16">
+              <span className="bg-gradient-bitcoin bg-clip-text text-transparent">Why Choose ULW?</span>
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: Shield,
+                  title: 'Self-Custodial',
+                  description: 'Your keys, your Bitcoin. Full control and sovereignty over your funds.',
+                  gradient: 'from-blue-500 to-cyan-500',
+                },
+                {
+                  icon: Zap,
+                  title: 'Lightning Fast',
+                  description: 'Instant payments with minimal fees using Lightning Network technology.',
+                  gradient: 'from-bitcoin-500 to-lightning-400',
+                },
+                {
+                  icon: Cpu,
+                  title: 'Powered by Rust',
+                  description: 'Built with BDK & LDK for maximum security and performance.',
+                  gradient: 'from-purple-500 to-pink-500',
+                },
+              ].map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -10, scale: 1.02 }}
+                  className="relative group"
                 >
-                  Download Desktop App
-                </a>
-              </div>
+                  <div className="absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 ${feature.gradient}" />
+                  <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 group-hover:border-white/20 transition-all">
+                    <div className={`inline-flex p-4 bg-gradient-to-r ${feature.gradient} rounded-xl mb-6 shadow-lg`}>
+                      <feature.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
+                    <p className="text-gray-400 leading-relaxed">{feature.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
 
-              {/* CLI */}
-              <div className="border-2 border-blue-500 rounded-lg p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                    <Terminal className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-lg">CLI Version</div>
-                    <div className="text-sm text-gray-400">Command Line</div>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-400 mb-4">
-                  Powerful command-line interface for advanced users
+          {/* Download Section */}
+          <motion.section
+            id="download"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="container mx-auto px-6 py-20"
+          >
+            <div className="bg-gradient-to-r from-dark-900 to-dark-800 rounded-3xl p-12 border border-bitcoin-500/20 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-bitcoin-500/10 rounded-full blur-3xl" />
+
+              <div className="relative z-10">
+                <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                  <span className="bg-gradient-bitcoin bg-clip-text text-transparent">Download Full Version</span>
+                </h2>
+                <p className="text-xl text-gray-300 mb-12 max-w-2xl">
+                  Get the complete wallet with full functionality on desktop or command line.
                 </p>
-                <a
-                  href="https://github.com/chaitanya21kumar/unified-lightning-wallet#cli-usage"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full text-center p-3 bg-blue-500 rounded hover:bg-blue-600 transition"
-                >
-                  View CLI Docs
-                </a>
-              </div>
-            </div>
 
-            {/* Installation */}
-            <div className="bg-[var(--background)] p-4 rounded-lg">
-              <div className="font-bold mb-2">Quick Install (Rust/Cargo):</div>
-              <code className="block p-3 bg-black/50 rounded text-sm overflow-x-auto">
-                git clone https://github.com/chaitanya21kumar/unified-lightning-wallet.git<br />
-                cd unified-lightning-wallet<br />
-                cargo build --release
-              </code>
-            </div>
-          </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10"
+                  >
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="p-3 bg-gradient-bitcoin rounded-xl">
+                        <Download className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold">Desktop GUI</h3>
+                        <p className="text-sm text-gray-400">Windows • macOS • Linux</p>
+                      </div>
+                    </div>
+                    <p className="text-gray-400 mb-6">Beautiful native application built with Tauri + React</p>
+                    <a
+                      href="https://github.com/chaitanya21kumar/unified-lightning-wallet/releases"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-center px-6 py-3 bg-gradient-bitcoin rounded-lg font-semibold hover:shadow-bitcoin transition-all"
+                    >
+                      Download Desktop App
+                    </a>
+                  </motion.div>
 
-          {/* GitHub */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg">
-            <div className="flex items-center gap-3 mb-4">
-              <Github className="w-8 h-8" />
-              <div>
-                <div className="font-bold text-lg">Open Source</div>
-                <div className="text-sm text-gray-400">MIT Licensed • Built with Rust</div>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10"
+                  >
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="p-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl">
+                        <Terminal className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold">CLI Version</h3>
+                        <p className="text-sm text-gray-400">Command Line Interface</p>
+                      </div>
+                    </div>
+                    <p className="text-gray-400 mb-6">Powerful CLI for developers and advanced users</p>
+                    <a
+                      href="https://github.com/chaitanya21kumar/unified-lightning-wallet#cli-usage"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-center px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg font-semibold hover:shadow-lg transition-all"
+                    >
+                      View CLI Docs
+                    </a>
+                  </motion.div>
+                </div>
               </div>
             </div>
-            <a
-              href="https://github.com/chaitanya21kumar/unified-lightning-wallet"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded transition"
-            >
-              <Github className="w-5 h-5" />
-              View on GitHub
-            </a>
-          </div>
+          </motion.section>
 
-          {/* Tech Stack */}
-          <div className="bg-[var(--surface)] p-6 rounded-lg">
-            <h3 className="text-lg font-bold mb-4">Technology Stack</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div className="text-center p-3 bg-[var(--background)] rounded">
-                <div className="font-bold text-orange-500">Rust</div>
-                <div className="text-gray-400">Core Language</div>
-              </div>
-              <div className="text-center p-3 bg-[var(--background)] rounded">
-                <div className="font-bold text-blue-500">BDK 1.0</div>
-                <div className="text-gray-400">On-Chain</div>
-              </div>
-              <div className="text-center p-3 bg-[var(--background)] rounded">
-                <div className="font-bold text-yellow-500">LDK</div>
-                <div className="text-gray-400">Lightning</div>
-              </div>
-              <div className="text-center p-3 bg-[var(--background)] rounded">
-                <div className="font-bold text-cyan-500">Tauri</div>
-                <div className="text-gray-400">Desktop UI</div>
-              </div>
+          {/* Footer */}
+          <footer className="container mx-auto px-6 py-12 text-center text-gray-500">
+            <p className="mb-4">Built for Summer of Bitcoin 2026 • Open Source • MIT Licensed</p>
+            <div className="flex justify-center gap-6">
+              <a href="https://github.com/chaitanya21kumar/unified-lightning-wallet" className="hover:text-bitcoin-500 transition-colors">
+                GitHub
+              </a>
+              <a href="https://github.com/chaitanya21kumar/unified-lightning-wallet/blob/main/docs/USER_GUIDE.md" className="hover:text-bitcoin-500 transition-colors">
+                Documentation
+              </a>
+              <a href="https://github.com/chaitanya21kumar/unified-lightning-wallet/blob/main/docs/ARCHITECTURE.md" className="hover:text-bitcoin-500 transition-colors">
+                Architecture
+              </a>
             </div>
-          </div>
+          </footer>
         </div>
-      )}
+      </div>
+    )
+  }
 
-      {/* Footer */}
-      <footer className="mt-12 text-center text-sm text-gray-500">
-        <p>Built for Summer of Bitcoin 2026 • MIT Licensed</p>
-        <p className="mt-2">
-          <a
-            href="https://github.com/chaitanya21kumar/unified-lightning-wallet"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[var(--primary)] hover:text-[var(--accent)]"
+  // Wallet Demo View
+  return (
+    <div className="min-h-screen bg-dark-950 text-white">
+      <Toaster position="top-right" />
+
+      {/* Warning Banner */}
+      <div className="bg-bitcoin-500/10 border-y border-bitcoin-500/30 py-3">
+        <div className="container mx-auto px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-bitcoin-400" />
+            <p className="text-sm text-bitcoin-300">
+              <strong>Demo Mode:</strong> This is a UI demonstration. Download the full app for actual wallet functionality.
+            </p>
+          </div>
+          <motion.button
+            onClick={() => setActiveView('landing')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-sm px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
           >
-            GitHub Repository
-          </a>
-          {' '} | {' '}
-          <a
-            href="https://github.com/chaitanya21kumar/unified-lightning-wallet/blob/main/README.md"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[var(--primary)] hover:text-[var(--accent)]"
+            Back to Home
+          </motion.button>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-6 py-8">
+        {/* Balance Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-br from-bitcoin-600 to-lightning-600 rounded-3xl p-8 mb-8 shadow-bitcoin relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+
+          <div className="relative z-10">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <p className="text-white/80 text-sm mb-2">Total Balance</p>
+                <div className="flex items-center gap-4">
+                  {showBalance ? (
+                    <h2 className="text-5xl font-bold text-white">0.00150000 BTC</h2>
+                  ) : (
+                    <h2 className="text-5xl font-bold text-white">••••••••</h2>
+                  )}
+                  <button
+                    onClick={() => setShowBalance(!showBalance)}
+                    className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+                  >
+                    {showBalance ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                <p className="text-white/60 text-sm mt-2">≈ $67.50 USD (Demo)</p>
+              </div>
+              <div className="flex gap-2">
+                <div className="px-3 py-1 bg-white/10 rounded-lg text-sm backdrop-blur-sm">
+                  <Globe className="w-4 h-4 inline mr-1" />
+                  Testnet
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Tabs */}
+        <div className="flex gap-4 mb-6">
+          <motion.button
+            onClick={() => setWalletTab('onchain')}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`flex-1 py-4 rounded-xl font-semibold transition-all ${
+              walletTab === 'onchain'
+                ? 'bg-gradient-bitcoin shadow-bitcoin'
+                : 'bg-white/5 hover:bg-white/10'
+            }`}
           >
-            Documentation
-          </a>
-        </p>
-      </footer>
+            <Wallet className="w-5 h-5 inline mr-2" />
+            On-Chain
+          </motion.button>
+          <motion.button
+            onClick={() => setWalletTab('lightning')}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`flex-1 py-4 rounded-xl font-semibold transition-all ${
+              walletTab === 'lightning'
+                ? 'bg-gradient-lightning text-dark-950 shadow-lg'
+                : 'bg-white/5 hover:bg-white/10'
+            }`}
+          >
+            <Zap className="w-5 h-5 inline mr-2" />
+            Lightning
+          </motion.button>
+        </div>
+
+        {/* Wallet Content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={walletTab}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="grid md:grid-cols-2 gap-6"
+          >
+            {/* Receive Section */}
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <Download className="w-5 h-5 text-green-400" />
+                </div>
+                Receive
+              </h3>
+
+              <div className="bg-white p-4 rounded-xl mb-4">
+                <QRCodeSVG value={receiveAddress} size={200} className="mx-auto" />
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={receiveAddress}
+                  readOnly
+                  className="flex-1 px-4 py-3 bg-dark-900 rounded-lg text-sm font-mono"
+                />
+                <button
+                  onClick={() => copyToClipboard(receiveAddress, 'Address')}
+                  className="p-3 bg-bitcoin-500 rounded-lg hover:bg-bitcoin-600 transition-colors"
+                >
+                  <Copy className="w-5 h-5" />
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Testnet address for demonstration</p>
+            </div>
+
+            {/* Send Section */}
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <div className="p-2 bg-bitcoin-500/20 rounded-lg">
+                  <Send className="w-5 h-5 text-bitcoin-400" />
+                </div>
+                Send
+              </h3>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Recipient Address</label>
+                  <input
+                    type="text"
+                    placeholder="Enter Bitcoin address..."
+                    disabled
+                    className="w-full px-4 py-3 bg-dark-900/50 rounded-lg opacity-50 cursor-not-allowed"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Amount</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      placeholder="0.00000000"
+                      value={sendAmount}
+                      onChange={(e) => setSendAmount(e.target.value)}
+                      disabled
+                      className="w-full px-4 py-3 pr-16 bg-dark-900/50 rounded-lg opacity-50 cursor-not-allowed"
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">BTC</span>
+                  </div>
+                </div>
+
+                <button
+                  disabled
+                  className="w-full py-4 bg-gray-600 rounded-lg font-semibold opacity-50 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Download className="w-5 h-5" />
+                  Download Full App to Send
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Transaction History */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-8 bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10"
+        >
+          <h3 className="text-xl font-bold mb-4">Recent Transactions</h3>
+          <div className="text-center py-12 text-gray-500">
+            <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>No transactions yet</p>
+            <p className="text-sm mt-2">Download the full app to start using your wallet</p>
+          </div>
+        </motion.div>
+      </div>
     </div>
   )
 }
