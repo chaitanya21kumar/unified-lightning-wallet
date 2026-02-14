@@ -168,30 +168,28 @@ async fn main() -> Result<()> {
         Commands::Channels { action } => match action {
             None | Some(ChannelCommands::List) => {
                 println!("⚡ Lightning Channels");
-                println!("No channels yet. Use 'ulw channels open' to create one.");
+                println!("📝 Channel management coming soon!");
+                println!("   For now, use invoice/pay commands for Lightning");
             }
             Some(ChannelCommands::Open { node_id, amount }) => {
-                println!("Opening channel to {} with {} satoshis", node_id, amount);
-                println!("⚠️  Lightning functionality coming soon!");
+                println!("⚡ Opening channel to {} with {} satoshis", node_id, amount);
+                println!("📝 Channel management coming soon!");
             }
             Some(ChannelCommands::Close { channel_id }) => {
-                println!("Closing channel {}", channel_id);
-                println!("⚠️  Lightning functionality coming soon!");
+                println!("⚡ Closing channel {}", channel_id);
+                println!("📝 Channel management coming soon!");
             }
         },
         Commands::Invoice {
             amount,
             description,
         } => {
-            println!("Creating invoice for {} satoshis", amount);
-            if let Some(desc) = description {
-                println!("Description: {}", desc);
-            }
-            println!("⚠️  Lightning functionality coming soon!");
+            let config = load_config()?;
+            commands::create_invoice(&config, amount, description).await?;
         }
         Commands::Pay { invoice } => {
-            println!("Paying invoice: {}", invoice);
-            println!("⚠️  Lightning functionality coming soon!");
+            let config = load_config()?;
+            commands::pay_invoice(&config, invoice).await?;
         }
     }
 
