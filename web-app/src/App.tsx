@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { Toaster, toast } from 'react-hot-toast'
+import { Analytics } from '@vercel/analytics/react'
 import './App.css'
 
 function App() {
@@ -313,6 +314,7 @@ function App() {
             </div>
           </footer>
         </div>
+        <Analytics />
       </div>
     )
   }
@@ -511,6 +513,7 @@ function App() {
           </div>
         </motion.div>
       </div>
+      <Analytics />
     </div>
   )
 }
